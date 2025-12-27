@@ -1,27 +1,20 @@
 [
-    {
-        "id": "P001",
-        "nombre": "Juan Perez",
-        "horas_vuelo": 5200
-    },
-    {
-        "id": "P002",
-        "nombre": "Maria Lopez",
-        "horas_vuelo": 3400
-    },
-    {
-        "id": "P003",
-        "nombre": "Carlos Gomez",
-        "horas_vuelo": 7800
-    },
-    {
-        "id": "P004",
-        "nombre": "Ana Martinez",
-        "horas_vuelo": 4100
-    },
-    {
-        "id": "P005",
-        "nombre": "Luis Hernandez",
-        "horas_vuelo": 2900
-    }
+  {
+    "id": "P001",
+    "nombre": "Juan Perez",
+    "licencia": "LIC123",
+    "horas_vuelo": 1200
+  },
+  {
+    "id": "P002",
+    "nombre": "Ana Lopez",
+    "licencia": "LIC456",
+    "horas_vuelo": 950
+  },
+  {
+    "id": "P003",
+    "nombre": "Carlos Ramirez",
+    "licencia": "LIC789",
+    "horas_vuelo": 1500
+  }
 ]

@@ -1,0 +1,8 @@
+digraph ArbolBST {
+    node [shape=circle];
+    "P001\n1200 hrs";
+    "P001\n1200 hrs" -> "P002\n950 hrs";
+    "P002\n950 hrs";
+    "P001\n1200 hrs" -> "P003\n1500 hrs";
+    "P003\n1500 hrs";
+}
