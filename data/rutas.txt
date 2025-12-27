@@ -1,0 +1,9 @@
+Guatemala/Ciudad de Mexico/1050;
+Guatemala/Bogota/1900;
+Guatemala/Panama/1350;
+Ciudad de Mexico/Miami/2100;
+Bogota/Miami/2400;
+Panama/Miami/1800;
+Ciudad de Mexico/Frankfurt/9500;
+Miami/Frankfurt/7800;
+Bogota/Panama/800;
