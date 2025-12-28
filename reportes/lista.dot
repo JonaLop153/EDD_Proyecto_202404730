@@ -1,0 +1,10 @@
+digraph ListaCircular {
+rankdir=LR;
+node [shape=record];
+"N44444" [label="{N44444|Airbus A330|Mantenimiento}"];
+"N11111" [label="{N11111|Boeing 737|Mantenimiento}"];
+"N44444" -> "N11111";
+"N44444" -> "N11111" [constraint=false];
+"N11111" -> "N44444";
+"N11111" -> "N44444" [constraint=false];
+}

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <limits>
 
 #include "../include/json.hpp"
 #include "../include/Avion.h"
@@ -17,7 +18,8 @@
 using json = nlohmann::json;
 using namespace std;
 
-/* ================== ESTRUCTURAS GLOBALES ================== */
+/* ===================== ESTRUCTURAS GLOBALES ===================== */
+
 ArbolB* arbolAvionesDisponibles = new ArbolB(5);
 ListaCircular* listaMantenimiento = new ListaCircular();
 ArbolBST* arbolPilotos = new ArbolBST();
@@ -25,7 +27,8 @@ TablaHash* tablaPilotos = new TablaHash(19);
 Grafo* grafoRutas = new Grafo();
 MatrizDispersa* matrizVuelos = new MatrizDispersa();
 
-/* ================== UTILIDADES ================== */
+/* ===================== UTILIDADES ===================== */
+
 void limpiarPantalla() {
 #ifdef _WIN32
     system("cls");
@@ -36,19 +39,20 @@ void limpiarPantalla() {
 
 void pausa() {
     cout << "\nPresione ENTER para continuar...";
-    cin.ignore();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cin.get();
 }
 
-/* ================== CARGA DE AVIONES ================== */
+/* ===================== CARGAS ===================== */
+
 void cargarAviones() {
     string ruta;
-    cout << "Ingrese la ruta del archivo JSON de aviones: ";
+    cout << "Ingrese la ruta del JSON de aviones: ";
     cin >> ruta;
 
     ifstream archivo(ruta);
     if (!archivo.is_open()) {
-        cout << "Error al abrir archivo." << endl;
+        cout << "No se pudo abrir el archivo." << endl;
         pausa();
         return;
     }
@@ -57,16 +61,16 @@ void cargarAviones() {
     archivo >> datos;
     archivo.close();
 
-    int contador = 0;
-    for (auto& item : datos) {
+    int cont = 0;
+    for (auto& a : datos) {
         Avion* avion = new Avion(
-            item.value("vuelo", ""),
-            item.value("numero_de_registro", ""),
-            item.value("modelo", ""),
-            item.value("capacidad", 0),
-            item.value("aerolinea", ""),
-            item.value("ciudad_destino", ""),
-            item.value("estado", "")
+            a["vuelo"],
+            a["numero_de_registro"],
+            a["modelo"],
+            a["capacidad"],
+            a["aerolinea"],
+            a["ciudad_destino"],
+            a["estado"]
         );
 
         if (avion->getEstado() == "Disponible")
@@ -74,22 +78,21 @@ void cargarAviones() {
         else
             listaMantenimiento->insertar(avion);
 
-        contador++;
+        cont++;
     }
 
-    cout << "Se cargaron " << contador << " aviones exitosamente." << endl;
+    cout << "Se cargaron " << cont << " aviones." << endl;
     pausa();
 }
 
-/* ================== CARGA DE PILOTOS ================== */
 void cargarPilotos() {
     string ruta;
-    cout << "Ingrese la ruta del archivo JSON de pilotos: ";
+    cout << "Ingrese la ruta del JSON de pilotos: ";
     cin >> ruta;
 
     ifstream archivo(ruta);
     if (!archivo.is_open()) {
-        cout << "Error al abrir archivo." << endl;
+        cout << "No se pudo abrir el archivo." << endl;
         pausa();
         return;
     }
@@ -98,74 +101,85 @@ void cargarPilotos() {
     archivo >> datos;
     archivo.close();
 
-    int contador = 0;
-    for (auto& item : datos) {
-        Piloto* p = new Piloto(
-            item.value("nombre", ""),
-            "Desconocida",
-            item.value("id", ""),
+    int cont = 0;
+    for (auto& p : datos) {
+        Piloto* piloto = new Piloto(
+            p["nombre"],
+            p["nacionalidad"],
+            p["id"],
             "No asignado",
-            item.value("horas_vuelo", 0),
-            item.value("licencia", "")
+            p["horas_vuelo"],
+            p["licencia"]
         );
 
-        arbolPilotos->insertar(p);
-        tablaPilotos->insertar(p);
-        contador++;
+        arbolPilotos->insertar(piloto);
+        tablaPilotos->insertar(piloto);
+        cont++;
     }
 
-    cout << "Se cargaron " << contador << " pilotos exitosamente." << endl;
+    cout << "Se cargaron " << cont << " pilotos." << endl;
     pausa();
 }
 
-/* ================== CARGA DE RUTAS ================== */
 void cargarRutas() {
-    string ruta;
-    cout << "Ingrese la ruta del archivo TXT de rutas: ";
-    cin >> ruta;
+    string rutaArchivo;
+    cout << "Ingrese la ruta del TXT de rutas: ";
+    cin >> rutaArchivo;
 
-    ifstream archivo(ruta);
+    ifstream archivo(rutaArchivo);
     if (!archivo.is_open()) {
-        cout << "Error al abrir archivo." << endl;
+        cout << "Error: No se pudo abrir el archivo." << endl;
         pausa();
         return;
     }
 
     string linea;
     int contador = 0;
+
     while (getline(archivo, linea)) {
-        string origen, destino, dist;
+        if (linea.empty()) continue;
+
+        string origen, destino, distanciaStr;
         stringstream ss(linea);
 
-        getline(ss, origen, '/');
-        getline(ss, destino, '/');
-        getline(ss, dist, ';');
+        if (getline(ss, origen, '/') &&
+            getline(ss, destino, '/') &&
+            getline(ss, distanciaStr, ';')) {
 
-        grafoRutas->agregarRuta(origen, destino, stoi(dist));
-        contador++;
+            // Limpiar espacios
+            distanciaStr.erase(
+                remove_if(distanciaStr.begin(), distanciaStr.end(), ::isspace),
+                distanciaStr.end()
+            );
+
+            try {
+                int distancia = stoi(distanciaStr);
+                grafoRutas->agregarRuta(origen, destino, distancia);
+                contador++;
+            } catch (...) {
+                cout << "Ruta invalida ignorada: " << linea << endl;
+            }
+        }
     }
 
     archivo.close();
     cout << "Se cargaron " << contador << " rutas exitosamente." << endl;
     pausa();
 }
-
-/* ================== CARGA DE ASIGNACIONES (TXT) ================== */
 void cargarAsignaciones() {
     string ruta;
-    cout << "Ingrese la ruta del archivo de asignaciones (TXT): ";
+    cout << "Ingrese la ruta del archivo de asignaciones (CSV): ";
     cin >> ruta;
 
     ifstream archivo(ruta);
     if (!archivo.is_open()) {
-        cout << "Error al abrir archivo." << endl;
+        cout << "No se pudo abrir el archivo." << endl;
         pausa();
         return;
     }
 
     string linea;
-    int contador = 0;
-
+    int cont = 0;
     while (getline(archivo, linea)) {
         string id, vuelo, ciudad;
         stringstream ss(linea);
@@ -175,15 +189,16 @@ void cargarAsignaciones() {
         getline(ss, ciudad);
 
         matrizVuelos->insertar(id, ciudad, vuelo);
-        contador++;
+        cont++;
     }
 
     archivo.close();
-    cout << "Se cargaron " << contador << " asignaciones exitosamente." << endl;
+    cout << "Se cargaron " << cont << " asignaciones." << endl;
     pausa();
 }
 
-/* ================== PROCESAR MOVIMIENTOS ================== */
+/* ===================== MOVIMIENTOS ===================== */
+
 void procesarMovimientos() {
     string ruta;
     cout << "Ingrese la ruta del archivo de movimientos: ";
@@ -191,93 +206,158 @@ void procesarMovimientos() {
 
     ifstream archivo(ruta);
     if (!archivo.is_open()) {
-        cout << "Error al abrir archivo." << endl;
+        cout << "No se pudo abrir el archivo." << endl;
         pausa();
         return;
     }
 
     string linea;
-    int contador = 0;
+    int cont = 0;
 
     while (getline(archivo, linea)) {
-        if (linea.find("MantenimientoAviones") == 0) {
-            string _, estado, registro;
+        if (linea.find("MantenimientoAviones") != string::npos) {
+            string cmd, estado, registro;
             stringstream ss(linea);
-            ss >> _ >> estado >> registro;
+            ss >> cmd >> estado >> registro;
 
             if (estado == "Disponible") {
                 Avion* a = listaMantenimiento->buscar(registro);
                 if (a) {
-                    a->setEstado("Disponible");
                     listaMantenimiento->eliminar(registro);
+                    a->setEstado("Disponible");
                     arbolAvionesDisponibles->insertar(registro, a);
+                    cont++;
                 }
             } else {
                 Avion* a = arbolAvionesDisponibles->buscar(registro);
                 if (a) {
-                    a->setEstado("Mantenimiento");
                     arbolAvionesDisponibles->eliminar(registro);
+                    a->setEstado("Mantenimiento");
                     listaMantenimiento->insertar(a);
+                    cont++;
                 }
             }
-            contador++;
-        }
-        else if (linea.find("DarDeBaja") == 0) {
-            size_t i = linea.find("(");
-            size_t f = linea.find(")");
-            string id = linea.substr(i + 1, f - i - 1);
+        } 
+        else if (linea.find("DarDeBaja") != string::npos) {
+            size_t ini = linea.find("(");
+            size_t fin = linea.find(")");
+            string id = linea.substr(ini + 1, fin - ini - 1);
 
             arbolPilotos->eliminar(id);
             tablaPilotos->eliminar(id);
             matrizVuelos->eliminarPiloto(id);
-            contador++;
+            cont++;
         }
     }
 
     archivo.close();
-    cout << "Se procesaron " << contador << " movimientos." << endl;
+    cout << "Se procesaron " << cont << " movimientos." << endl;
     pausa();
 }
 
-/* ================== MENÚS ================== */
+/* ===================== CONSULTAS ===================== */
+
 void menuConsultas() {
     int op;
     do {
         limpiarPantalla();
-        cout << "\n=== CONSULTAS ===" << endl;
-        cout << "1. Aviones disponibles (reporte)" << endl;
-        cout << "2. Aviones en mantenimiento (reporte)" << endl;
-        cout << "3. Pilotos (tabla hash)" << endl;
-        cout << "4. Grafo de rutas" << endl;
-        cout << "5. Matriz de vuelos" << endl;
-        cout << "6. Volver" << endl;
-        cout << "Seleccione: ";
+        cout << "\n=== MENU DE CONSULTAS ===\n";
+        cout << "1. Aviones disponibles\n";
+        cout << "2. Aviones en mantenimiento\n";
+        cout << "3. Pilotos (Hash)\n";
+        cout << "4. Rutas\n";
+        cout << "5. Matriz de vuelos\n";
+        cout << "6. Volver\n";
+        cout << "Opcion: ";
         cin >> op;
 
         switch (op) {
-            case 1: arbolAvionesDisponibles->generarReporte("consulta_disponibles"); pausa(); break;
-            case 2: listaMantenimiento->generarReporte("consulta_mantenimiento"); pausa(); break;
-            case 3: tablaPilotos->mostrar(); pausa(); break;
-            case 4: grafoRutas->mostrar(); pausa(); break;
-            case 5: matrizVuelos->mostrar(); pausa(); break;
+            case 1:
+                arbolAvionesDisponibles->generarReporte("consulta_disponibles");
+                pausa(); break;
+            case 2:
+                listaMantenimiento->mostrar();
+                pausa(); break;
+            case 3:
+                tablaPilotos->mostrar();
+                pausa(); break;
+            case 4:
+                grafoRutas->mostrar();
+                pausa(); break;
+            case 5:
+                matrizVuelos->mostrar();
+                pausa(); break;
         }
     } while (op != 6);
 }
 
-void menuReportes() {
-    arbolAvionesDisponibles->generarReporte("arbol_b");
-    listaMantenimiento->generarReporte("lista_mantenimiento");
-    arbolPilotos->generarReporte("bst_pilotos");
-    tablaPilotos->generarReporte("tabla_hash");
-    grafoRutas->generarReporte("grafo");
-    matrizVuelos->generarReporte("matriz");
+/* ===================== RECORRIDOS BST ===================== */
+
+void recorridosArbol() {
+    int op;
+    do {
+        limpiarPantalla();
+        cout << "\n1. Preorden\n2. Inorden\n3. Postorden\n4. Volver\nOpcion: ";
+        cin >> op;
+
+        if (!arbolPilotos->estaVacio()) {
+            if (op == 1) arbolPilotos->preorden();
+            if (op == 2) arbolPilotos->inorden();
+            if (op == 3) arbolPilotos->postorden();
+        }
+        if (op != 4) pausa();
+    } while (op != 4);
+}
+
+/* ===================== RUTA MAS CORTA ===================== */
+
+void recomendarRuta() {
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    string origen, destino;
+
+    cout << "Ciudad origen: ";
+    getline(cin, origen);
+    cout << "Ciudad destino: ";
+    getline(cin, destino);
+
+    int distancia;
+    vector<string> ruta = grafoRutas->rutaMasCorta(origen, destino, distancia);
+
+    if (ruta.empty()) {
+        cout << "No existe ruta.\n";
+    } else {
+        cout << "Ruta: ";
+        for (auto& c : ruta) cout << c << " ";
+        cout << "\nDistancia: " << distancia << " km\n";
+    }
     pausa();
 }
 
-/* ================== MAIN ================== */
+/* ===================== REPORTES ===================== */
+
+void menuReportes() {
+    int op;
+    do {
+        limpiarPantalla();
+        cout << "\n1. Arbol B\n2. Lista\n3. BST\n4. Hash\n5. Grafo\n6. Matriz\n7. Volver\nOpcion: ";
+        cin >> op;
+
+        if (op == 1) arbolAvionesDisponibles->generarReporte("arbol_b");
+        if (op == 2) listaMantenimiento->generarReporte("lista");
+        if (op == 3) arbolPilotos->generarReporte("bst");
+        if (op == 4) tablaPilotos->generarReporte("hash");
+        if (op == 5) grafoRutas->generarReporte("grafo");
+        if (op == 6) matrizVuelos->generarReporte("matriz");
+
+        if (op != 7) pausa();
+    } while (op != 7);
+}
+
+/* ===================== MAIN ===================== */
+
 int main() {
 #ifdef _WIN32
-    system("mkdir reportes 2>nul");
+    system("if not exist reportes mkdir reportes");
 #else
     system("mkdir -p reportes");
 #endif
@@ -285,16 +365,8 @@ int main() {
     int op;
     do {
         limpiarPantalla();
-        cout << "\n===== SISTEMA DE GESTION DE AEROPUERTO =====" << endl;
-        cout << "1. Cargar aviones" << endl;
-        cout << "2. Cargar pilotos" << endl;
-        cout << "3. Cargar rutas" << endl;
-        cout << "4. Cargar asignaciones" << endl;
-        cout << "5. Consultas" << endl;
-        cout << "6. Reportes" << endl;
-        cout << "7. Procesar movimientos" << endl;
-        cout << "8. Salir" << endl;
-        cout << "Seleccione: ";
+        cout << "\n1.Cargar Aviones\n2.Cargar Pilotos\n3.Cargar Rutas\n4.Cargar Asignaciones\n";
+        cout << "5.Consultas\n6.Recorridos\n7.Reportes\n8.Ruta mas corta\n9.Movimientos\n10.Salir\nOpcion: ";
         cin >> op;
 
         switch (op) {
@@ -303,11 +375,12 @@ int main() {
             case 3: cargarRutas(); break;
             case 4: cargarAsignaciones(); break;
             case 5: menuConsultas(); break;
-            case 6: menuReportes(); break;
-            case 7: procesarMovimientos(); break;
+            case 6: recorridosArbol(); break;
+            case 7: menuReportes(); break;
+            case 8: recomendarRuta(); break;
+            case 9: procesarMovimientos(); break;
         }
-    } while (op != 8);
+    } while (op != 10);
 
-    cout << "Gracias por usar el sistema." << endl;
     return 0;
 }

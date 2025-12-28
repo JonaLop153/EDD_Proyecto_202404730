@@ -1,4 +1,4 @@
-P001,AV001,Ciudad de Mexico
-P002,AV002,Bogota
-P003,AV004,Frankfurt
-P004,AV003,Panama
+P001,AV001,Bogota
+P002,AV002,Panama
+P003,AV003,Frankfurt
+P004,AV004,Ciudad de Mexico

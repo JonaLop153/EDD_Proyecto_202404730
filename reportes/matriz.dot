@@ -1,0 +1,7 @@
+digraph Matriz {
+rankdir=TB;
+node [shape=box];
+"P001" -> "Bogota\nAV001";
+"P002" -> "Panama\nAV002";
+"P003" -> "Frankfurt\nAV003";
+}

@@ -8,7 +8,6 @@ digraph Grafo {
     "Miami";
     "Panama";
     "Bogota" -> "Miami" [label="2400 km"];
-    "Bogota" -> "Panama" [label="800 km"];
     "Ciudad de Mexico" -> "Miami" [label="2100 km"];
     "Ciudad de Mexico" -> "Frankfurt" [label="9500 km"];
     "Guatemala" -> "Ciudad de Mexico" [label="1050 km"];

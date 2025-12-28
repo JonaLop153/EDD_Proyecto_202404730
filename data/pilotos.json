@@ -2,18 +2,21 @@
   {
     "id": "P001",
     "nombre": "Juan Perez",
+    "nacionalidad": "Guatemala",
     "licencia": "LIC123",
     "horas_vuelo": 1200
   },
   {
     "id": "P002",
     "nombre": "Ana Lopez",
+    "nacionalidad": "Mexico",
     "licencia": "LIC456",
     "horas_vuelo": 950
   },
   {
     "id": "P003",
     "nombre": "Carlos Ramirez",
+    "nacionalidad": "Colombia",
     "licencia": "LIC789",
     "horas_vuelo": 1500
   }
