@@ -323,20 +323,23 @@ void ArbolB::generarReporte(string nombreArchivo) {
 
 void ArbolB::generarDotRecursivo(NodoB* nodo, ofstream& archivo, int& contador) {
     int idActual = contador++;
-    
+
+    // ===== Nodo actual =====
     archivo << "    nodo" << idActual << " [label=\"";
     for (int i = 0; i < nodo->n; i++) {
         if (i > 0) archivo << "|";
         archivo << "<f" << i << "> " << nodo->claves[i];
     }
     archivo << "\"];" << endl;
-    
+
+    // ===== Hijos =====
     if (!nodo->esHoja) {
         for (int i = 0; i <= nodo->n; i++) {
             int idHijo = contador;
             generarDotRecursivo(nodo->hijos[i], archivo, contador);
-            archivo << "    nodo" << idActual << ":f" << (i == 0 ? 0 : i-1) 
-                   << " -> nodo" << idHijo << ";" << endl;
+
+            // Conectar padre con hijo
+            archivo << "    nodo" << idActual << " -> nodo" << idHijo << ";" << endl;
         }
     }
 }

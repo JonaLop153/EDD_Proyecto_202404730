@@ -1,4 +1,0 @@
-digraph ArbolB {
-    node [shape=record];
-    nodo0 [label="<f0> N22222|<f1> N33333"];
-}

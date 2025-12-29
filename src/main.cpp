@@ -86,40 +86,57 @@ void cargarAviones() {
 }
 
 void cargarPilotos() {
-    string ruta;
+    string rutaArchivo;
     cout << "Ingrese la ruta del JSON de pilotos: ";
-    cin >> ruta;
+    cin >> rutaArchivo;
 
-    ifstream archivo(ruta);
+    ifstream archivo(rutaArchivo);
     if (!archivo.is_open()) {
-        cout << "No se pudo abrir el archivo." << endl;
-        pausa();
+        cout << "Error: No se pudo abrir el archivo." << endl;
         return;
     }
 
     json datos;
-    archivo >> datos;
-    archivo.close();
+    try {
+        archivo >> datos;
+    } catch (json::exception& e) {
+        cout << "Error al parsear JSON: " << e.what() << endl;
+        return;
+    }
 
-    int cont = 0;
-    for (auto& p : datos) {
+    if (!datos.is_array()) {
+        cout << "Error: El JSON de pilotos debe ser un arreglo." << endl;
+        return;
+    }
+
+    int contador = 0;
+
+    for (auto& item : datos) {
+        string nombre        = item.value("nombre", "Desconocido");
+        string nacionalidad  = item.value("nacionalidad", "Desconocida");
+        string numero_id     = item.value("numero_de_id", "");
+        string vuelo         = item.value("vuelo", "No asignado");
+        int horas_vuelo      = item.value("horas_de_vuelo", 0);
+        string licencia      = item.value("tipo_de_licencia", "");
+
         Piloto* piloto = new Piloto(
-            p["nombre"],
-            p["nacionalidad"],
-            p["id"],
-            "No asignado",
-            p["horas_vuelo"],
-            p["licencia"]
+            nombre,
+            nacionalidad,
+            numero_id,
+            vuelo,
+            horas_vuelo,
+            licencia
         );
 
         arbolPilotos->insertar(piloto);
         tablaPilotos->insertar(piloto);
-        cont++;
+        contador++;
     }
 
-    cout << "Se cargaron " << cont << " pilotos." << endl;
+    cout << "Se cargaron " << contador << " pilotos correctamente." << endl;
     pausa();
 }
+
 
 void cargarRutas() {
     string rutaArchivo;

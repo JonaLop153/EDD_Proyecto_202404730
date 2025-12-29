@@ -51,7 +51,7 @@ public:
     void eliminarPiloto(string idPiloto);
 
     void mostrar();
-    void generarReporte(string nombreArchivo);
+    void generarReporte(const string& nombreArchivo);
 };
 
 #endif

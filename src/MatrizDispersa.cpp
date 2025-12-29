@@ -199,11 +199,11 @@ void MatrizDispersa::mostrar() {
     }
 }
 
-/* ================== GRAPHVIZ ================== */
-
-void MatrizDispersa::generarReporte(string nombreArchivo) {
+void MatrizDispersa::generarReporte(const string& nombreArchivo) {
     ofstream archivo("reportes/" + nombreArchivo + ".dot");
-    archivo << "digraph Matriz {\nrankdir=TB;\nnode [shape=box];\n";
+    archivo << "digraph Matriz {\n";
+    archivo << "rankdir=TB;\n";
+    archivo << "node [shape=box];\n";
     generarDotMatriz(archivo);
     archivo << "}\n";
     archivo.close();
@@ -212,16 +212,88 @@ void MatrizDispersa::generarReporte(string nombreArchivo) {
             ".dot -o reportes/" + nombreArchivo + ".png").c_str());
 }
 
+/* ================== GRAPHVIZ ================== */
+
 void MatrizDispersa::generarDotMatriz(ofstream& archivo) {
+
+    // ===== ROOT =====
+    archivo << "ROOT [label=\"\", shape=box, style=filled, fillcolor=gray, group=0];\n";
+
+    /* ================== COLUMNAS (AVIONES) ================== */
+    archivo << "{ rank=same; ROOT; ";
+
+    int groupCol = 1;
+    NodoEncabezado* col = columnasEncabezado;
+    while (col) {
+        archivo << "\"" << col->id << "\" ";
+        col = col->siguiente;
+    }
+    archivo << "}\n";
+
+    // Definir columnas con group
+    groupCol = 1;
+    col = columnasEncabezado;
+    while (col) {
+        archivo << "\"" << col->id
+                << "\" [shape=box, style=filled, fillcolor=lightblue, group="
+                << groupCol << "];\n";
+        col = col->siguiente;
+        groupCol++;
+    }
+
+    // Enlaces horizontales de columnas
+    col = columnasEncabezado;
+    while (col && col->siguiente) {
+        archivo << "\"" << col->id << "\" -> \""
+                << col->siguiente->id << "\";\n";
+        col = col->siguiente;
+    }
+
+    if (columnasEncabezado)
+        archivo << "ROOT -> \"" << columnasEncabezado->id << "\";\n";
+
+    /* ================== FILAS (PILOTOS) ================== */
     NodoEncabezado* fila = filasEncabezado;
+
+    // Enlace vertical ROOT -> primera fila
+    if (fila)
+        archivo << "ROOT -> \"" << fila->id << "\";\n";
+
     while (fila) {
+        archivo << "\"" << fila->id
+                << "\" [shape=box, style=filled, fillcolor=lightyellow, group=0];\n";
+
+        if (fila->siguiente)
+            archivo << "\"" << fila->id << "\" -> \""
+                    << fila->siguiente->id << "\";\n";
+
+        /* ===== CELDAS ===== */
         NodoMatriz* nodo = fila->acceso;
         while (nodo) {
-            archivo << "\"" << fila->id << "\" -> \""
-                    << nodo->columna->id << "\\n"
-                    << nodo->valor << "\";\n";
+            // Obtener group correcto de la columna
+            int g = 1;
+            NodoEncabezado* tmp = columnasEncabezado;
+            while (tmp && tmp != nodo->columna) {
+                g++;
+                tmp = tmp->siguiente;
+            }
+
+            string idCelda = fila->id + "_" + nodo->columna->id;
+
+            archivo << idCelda
+                    << " [label=\"" << nodo->valor
+                    << "\", shape=ellipse, group=" << g << "];\n";
+
+            archivo << "\"" << fila->id << "\" -> " << idCelda << ";\n";
+            archivo << "\"" << nodo->columna->id << "\" -> " << idCelda << ";\n";
+
             nodo = nodo->derecha;
         }
+
         fila = fila->siguiente;
     }
 }
+
+
+
+
