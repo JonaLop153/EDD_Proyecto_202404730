@@ -104,54 +104,48 @@ void ArbolBST::eliminar(string id) {
     raiz = eliminarRecursivo(raiz, id);
 }
 
-NodoBST* ArbolBST::eliminarRecursivo(NodoBST* nodo, string id) {
-    if (nodo == nullptr) return nodo;
+   NodoBST* ArbolBST::eliminarRecursivo(NodoBST* nodo, string id) {
+    if (nodo == nullptr) return nullptr;
 
     if (id < nodo->piloto->numero_de_id) {
         nodo->izquierdo = eliminarRecursivo(nodo->izquierdo, id);
     } else if (id > nodo->piloto->numero_de_id) {
         nodo->derecho = eliminarRecursivo(nodo->derecho, id);
     } else {
-        if (nodo->izquierdo == nullptr || nodo->derecho == nullptr) {
-            NodoBST* temp = nodo->izquierdo ? nodo->izquierdo : nodo->derecho;
-
-            if (temp == nullptr) {
-                temp = nodo;
-                nodo = nullptr;
-            } else {
-                *nodo = *temp;
-            }
-            delete temp;
-        } else {
-            NodoBST* temp = encontrarMinimo(nodo->derecho);
-            nodo->piloto = temp->piloto;
-            nodo->derecho = eliminarRecursivo(nodo->derecho, temp->piloto->numero_de_id);
+        // Caso 1: Sin hijos o un solo hijo
+        if (nodo->izquierdo == nullptr) {
+            NodoBST* temp = nodo->derecho;
+            delete nodo;
+            return temp;
+        } else if (nodo->derecho == nullptr) {
+            NodoBST* temp = nodo->izquierdo;
+            delete nodo;
+            return temp;
         }
+        
+        // Caso 2: Dos hijos
+        NodoBST* temp = encontrarMinimo(nodo->derecho);
+        // Copiar solo el dato del piloto
+        nodo->piloto = temp->piloto;
+        // Eliminar el sucesor
+        nodo->derecho = eliminarRecursivo(nodo->derecho, temp->piloto->numero_de_id);
     }
 
-    if (nodo == nullptr) return nodo;
+    if (nodo == nullptr) return nullptr;
 
+    // Actualizar altura y balancear
     nodo->altura = 1 + max(obtenerAltura(nodo->izquierdo), obtenerAltura(nodo->derecho));
-
     int balance = obtenerBalance(nodo);
 
-    // Caso Left-Left
-    if (balance > 1 && obtenerBalance(nodo->izquierdo) >= 0) {
+    // Balancear (mismo código que tenías)
+    if (balance > 1 && obtenerBalance(nodo->izquierdo) >= 0)
         return rotarDerecha(nodo);
-    }
-
-    // Caso Left-Right
     if (balance > 1 && obtenerBalance(nodo->izquierdo) < 0) {
         nodo->izquierdo = rotarIzquierda(nodo->izquierdo);
         return rotarDerecha(nodo);
     }
-
-    // Caso Right-Right
-    if (balance < -1 && obtenerBalance(nodo->derecho) <= 0) {
+    if (balance < -1 && obtenerBalance(nodo->derecho) <= 0)
         return rotarIzquierda(nodo);
-    }
-
-    // Caso Right-Left
     if (balance < -1 && obtenerBalance(nodo->derecho) > 0) {
         nodo->derecho = rotarDerecha(nodo->derecho);
         return rotarIzquierda(nodo);
@@ -253,28 +247,39 @@ void ArbolBST::generarReporte(string nombreArchivo) {
 }
 
 void ArbolBST::generarDotRecursivo(NodoBST* nodo, ofstream& archivo) {
-    if (nodo != nullptr) {
-        archivo << "    \"" << nodo->piloto->numero_de_id << "\\n" 
-                << nodo->piloto->horas_de_vuelo << " hrs\";" << endl;
-        
-        if (nodo->izquierdo != nullptr) {
-            archivo << "    \"" << nodo->piloto->numero_de_id << "\\n" 
-                    << nodo->piloto->horas_de_vuelo << " hrs\" -> \"" 
-                    << nodo->izquierdo->piloto->numero_de_id << "\\n" 
-                    << nodo->izquierdo->piloto->horas_de_vuelo << " hrs\";" << endl;
-            generarDotRecursivo(nodo->izquierdo, archivo);
-        }
-        
-        if (nodo->derecho != nullptr) {
-            archivo << "    \"" << nodo->piloto->numero_de_id << "\\n" 
-                    << nodo->piloto->horas_de_vuelo << " hrs\" -> \"" 
-                    << nodo->derecho->piloto->numero_de_id << "\\n" 
-                    << nodo->derecho->piloto->horas_de_vuelo << " hrs\";" << endl;
-            generarDotRecursivo(nodo->derecho, archivo);
-        }
+   if (nodo->izquierdo != nullptr) {
+    archivo << "    \"" << nodo->piloto->numero_de_id << "\\n" 
+            << nodo->piloto->nombre << "\\n"
+            << nodo->piloto->horas_de_vuelo << " hrs\" -> \"" 
+            << nodo->izquierdo->piloto->numero_de_id << "\\n"
+            << nodo->izquierdo->piloto->nombre << "\\n"
+            << nodo->izquierdo->piloto->horas_de_vuelo << " hrs\";" << endl;
+    generarDotRecursivo(nodo->izquierdo, archivo);
+}
+
+if (nodo->derecho != nullptr) {
+    archivo << "    \"" << nodo->piloto->numero_de_id << "\\n" 
+            << nodo->piloto->nombre << "\\n"
+            << nodo->piloto->horas_de_vuelo << " hrs\" -> \"" 
+            << nodo->derecho->piloto->numero_de_id << "\\n"
+            << nodo->derecho->piloto->nombre << "\\n"
+            << nodo->derecho->piloto->horas_de_vuelo << " hrs\";" << endl;
+    generarDotRecursivo(nodo->derecho, archivo);
     }
 }
 
 bool ArbolBST::estaVacio() {
     return raiz == nullptr;
+}
+
+void ArbolBST::recorrerInorden(function<void(Piloto*)> accion) {
+    recorrerInordenRec(raiz, accion);
+}
+
+void ArbolBST::recorrerInordenRec(NodoBST* nodo, function<void(Piloto*)> accion) {
+    if (nodo == nullptr) return;
+
+    recorrerInordenRec(nodo->izquierdo, accion);
+    accion(nodo->piloto);          // 👈 AQUÍ entregamos el piloto
+    recorrerInordenRec(nodo->derecho, accion);
 }

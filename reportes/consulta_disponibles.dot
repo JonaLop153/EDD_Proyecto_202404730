@@ -1,8 +1,0 @@
-digraph ArbolB {
-    node [shape=record];
-    nodo0 [label="<f0> N70005"];
-    nodo1 [label="<f0> N50013|<f1> N70001|<f2> N70002|<f3> N70003|<f4> N70004"];
-    nodo0 -> nodo1;
-    nodo2 [label="<f0> N70006|<f1> N70007|<f2> N70008|<f3> N70009|<f4> N70010|<f5> N70011|<f6> N70012|<f7> N70014"];
-    nodo0 -> nodo2;
-}

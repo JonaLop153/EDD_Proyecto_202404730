@@ -3,6 +3,7 @@
 
 #include "Piloto.h"
 #include <fstream>
+#include <functional>
 
 class NodoBST {
 public:
@@ -30,6 +31,8 @@ private:
     void inordenRecursivo(NodoBST* nodo);
     void postordenRecursivo(NodoBST* nodo);
     void generarDotRecursivo(NodoBST* nodo, ofstream& archivo);
+    void recorrerInordenRec(NodoBST* nodo, function<void(Piloto*)> accion);
+
 
 public:
     ArbolBST();
@@ -41,6 +44,7 @@ public:
     void postorden();
     void generarReporte(string nombreArchivo);
     bool estaVacio();
+    void recorrerInorden(function<void(Piloto*)> accion);
 };
 
 #endif

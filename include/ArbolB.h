@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <functional>
 #include "Avion.h"
 
 using namespace std;
@@ -30,6 +31,7 @@ private:
     void dividirHijo(NodoB* padre, int i, NodoB* hijo);
 
     Avion* buscarRecursivo(NodoB* nodo, string clave);
+    Avion* buscarPorVueloRecursivo(NodoB* nodo, string vuelo); // NUEVO
 
     void eliminarRecursivo(NodoB* nodo, string clave);
     void obtenerPredecesor(NodoB* nodo, int idx, string& clave, Avion*& avion);
@@ -40,13 +42,17 @@ private:
     void fusionar(NodoB* nodo, int idx);
 
     void generarDotRecursivo(NodoB* nodo, ofstream& archivo, int& contador);
+    void recorrerTodosRecursivo(NodoB* nodo, function<void(Avion*)> funcion); // NUEVO
 
 public:
     ArbolB(int orden);
 
     void insertar(string clave, Avion* avion);
     Avion* buscar(string clave);
+    Avion* buscarPorVuelo(string vuelo); // NUEVO
     void eliminar(string clave);
+    
+    void recorrerTodos(function<void(Avion*)> funcion); // NUEVO
 
     void generarReporte(string nombreArchivo);
     bool estaVacio();

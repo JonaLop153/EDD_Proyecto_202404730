@@ -12,11 +12,11 @@ TablaHash::TablaHash(int tam) {
 }
 
 int TablaHash::funcionHash(string id) {
-    int suma = 0;
+    long long suma = 0;
     for (char c : id) {
-        suma += (int)c;
+        suma = (suma * 31 + (int)c) % 19;  // Mejor dispersión
     }
-    return suma % tamanio;
+    return suma % 19;  // ✅ Siempre módulo 19
 }
 
 void TablaHash::insertar(Piloto* piloto) {

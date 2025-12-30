@@ -9,9 +9,9 @@ class NodoEncabezado;
 
 class NodoMatriz {
 public:
-    string valor; // vuelo
-    NodoEncabezado* fila;
-    NodoEncabezado* columna;
+    string valor; // ID del piloto
+    NodoEncabezado* fila;    // Encabezado de vuelo
+    NodoEncabezado* columna; // Encabezado de ciudad
 
     NodoMatriz* arriba;
     NodoMatriz* abajo;
@@ -23,7 +23,7 @@ public:
 
 class NodoEncabezado {
 public:
-    string id;
+    string id; // Puede ser número de vuelo o nombre de ciudad
     NodoEncabezado* siguiente;
     NodoEncabezado* anterior;
     NodoMatriz* acceso;
@@ -33,10 +33,10 @@ public:
 
 class MatrizDispersa {
 private:
-    NodoEncabezado* filasEncabezado;
-    NodoEncabezado* columnasEncabezado;
+    NodoEncabezado* filasEncabezado;    // Vuelos
+    NodoEncabezado* columnasEncabezado; // Ciudades
 
-    NodoEncabezado* buscarCrearFila(string idPiloto);
+    NodoEncabezado* buscarCrearFila(string vuelo);
     NodoEncabezado* buscarCrearColumna(string ciudad);
 
     void insertarEnFila(NodoMatriz* nuevo);
@@ -47,7 +47,8 @@ private:
 public:
     MatrizDispersa();
 
-    void insertar(string idPiloto, string ciudad, string vuelo);
+    // Cambiar parámetros: vuelo, ciudad, idPiloto
+   void insertar(string vuelo, string ciudad, string idPiloto);
     void eliminarPiloto(string idPiloto);
 
     void mostrar();

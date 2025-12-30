@@ -85,20 +85,20 @@ NodoEncabezado* MatrizDispersa::buscarCrearColumna(string ciudad) {
 
 /* ================== INSERTAR ================== */
 
-void MatrizDispersa::insertar(string idPiloto, string ciudad, string vuelo) {
-    NodoEncabezado* fila = buscarCrearFila(idPiloto);
-    NodoEncabezado* columna = buscarCrearColumna(ciudad);
+void MatrizDispersa::insertar(string vuelo, string ciudad, string idPiloto) {
+    NodoEncabezado* fila = buscarCrearFila(vuelo);       // Filas = Vuelos
+    NodoEncabezado* columna = buscarCrearColumna(ciudad); // Columnas = Ciudades
 
     NodoMatriz* actual = fila->acceso;
     while (actual) {
         if (actual->columna == columna) {
-            actual->valor = vuelo;
+            actual->valor = idPiloto;  // Valor = ID Piloto
             return;
         }
         actual = actual->derecha;
     }
 
-    NodoMatriz* nuevo = new NodoMatriz(vuelo, fila, columna);
+    NodoMatriz* nuevo = new NodoMatriz(idPiloto, fila, columna); // Valor = ID Piloto
     insertarEnFila(nuevo);
     insertarEnColumna(nuevo);
 }
@@ -149,30 +149,33 @@ void MatrizDispersa::insertarEnColumna(NodoMatriz* nuevo) {
 
 void MatrizDispersa::eliminarPiloto(string idPiloto) {
     NodoEncabezado* fila = filasEncabezado;
-
-    while (fila && fila->id != idPiloto)
+    
+    while (fila) {
+        NodoMatriz* nodo = fila->acceso;
+        while (nodo) {
+            if (nodo->valor == idPiloto) {  // Valor = ID del piloto
+                // Eliminar este nodo
+                if (nodo->arriba) nodo->arriba->abajo = nodo->abajo;
+                else fila->acceso = (nodo == fila->acceso) ? nodo->derecha : fila->acceso;
+                
+                if (nodo->abajo) nodo->abajo->arriba = nodo->arriba;
+                
+                if (nodo->izquierda) nodo->izquierda->derecha = nodo->derecha;
+                else nodo->columna->acceso = (nodo == nodo->columna->acceso) ? nodo->abajo : nodo->columna->acceso;
+                
+                if (nodo->derecha) nodo->derecha->izquierda = nodo->izquierda;
+                
+                NodoMatriz* tmp = nodo;
+                nodo = nodo->derecha;
+                delete tmp;
+                
+                // Continuar buscando (el piloto puede estar en múltiples celdas)
+                continue;
+            }
+            nodo = nodo->derecha;
+        }
         fila = fila->siguiente;
-
-    if (!fila) return;
-
-    NodoMatriz* nodo = fila->acceso;
-    while (nodo) {
-        if (nodo->arriba) nodo->arriba->abajo = nodo->abajo;
-        else nodo->columna->acceso = nodo->abajo;
-
-        if (nodo->abajo) nodo->abajo->arriba = nodo->arriba;
-
-        NodoMatriz* tmp = nodo;
-        nodo = nodo->derecha;
-        delete tmp;
     }
-
-    if (fila->anterior) fila->anterior->siguiente = fila->siguiente;
-    else filasEncabezado = fila->siguiente;
-
-    if (fila->siguiente) fila->siguiente->anterior = fila->anterior;
-
-    delete fila;
 }
 
 /* ================== MOSTRAR ================== */

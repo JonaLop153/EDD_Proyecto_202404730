@@ -122,6 +122,34 @@ Avion* ArbolB::buscarRecursivo(NodoB* nodo, string clave) {
     return buscarRecursivo(nodo->hijos[i], clave);
 }
 
+// ===== NUEVO: BUSCAR POR VUELO =====
+Avion* ArbolB::buscarPorVuelo(string vuelo) {
+    if (raiz == nullptr) return nullptr;
+    return buscarPorVueloRecursivo(raiz, vuelo);
+}
+
+Avion* ArbolB::buscarPorVueloRecursivo(NodoB* nodo, string vuelo) {
+    // Buscar en este nodo
+    for (int i = 0; i < nodo->n; i++) {
+        if (nodo->aviones[i] && nodo->aviones[i]->getVuelo() == vuelo) {
+            return nodo->aviones[i];
+        }
+    }
+    
+    // Si es hoja, no hay más nodos
+    if (nodo->esHoja) return nullptr;
+    
+    // Buscar recursivamente en todos los hijos
+    for (int i = 0; i <= nodo->n; i++) {
+        Avion* resultado = buscarPorVueloRecursivo(nodo->hijos[i], vuelo);
+        if (resultado != nullptr) {
+            return resultado;
+        }
+    }
+    
+    return nullptr;
+}
+
 void ArbolB::eliminar(string clave) {
     if (raiz == nullptr) return;
     
@@ -346,4 +374,26 @@ void ArbolB::generarDotRecursivo(NodoB* nodo, ofstream& archivo, int& contador) 
 
 bool ArbolB::estaVacio() {
     return raiz == nullptr;
+}
+
+// ===== NUEVO: RECORRER TODOS LOS AVIONES =====
+void ArbolB::recorrerTodos(function<void(Avion*)> funcion) {
+    if (raiz == nullptr) return;
+    
+    function<void(NodoB*)> recorrerRec;
+    recorrerRec = [&](NodoB* nodo) {
+        // Procesar todos los aviones en este nodo
+        for (int i = 0; i < nodo->n; i++) {
+            funcion(nodo->aviones[i]);
+        }
+        
+        // Si no es hoja, recorrer hijos recursivamente
+        if (!nodo->esHoja) {
+            for (int i = 0; i <= nodo->n; i++) {
+                recorrerRec(nodo->hijos[i]);
+            }
+        }
+    };
+    
+    recorrerRec(raiz);
 }
