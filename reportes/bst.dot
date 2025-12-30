@@ -1,0 +1,18 @@
+digraph ArbolBST {
+    node [shape=circle];
+    "X70000123\nIsabella Santos\n215 hrs" -> "X30000123\nMarta Rodríguez\n150 hrs";
+    "X30000123\nMarta Rodríguez\n150 hrs" -> "X60000123\nMiguel Pereira\n80 hrs";
+    "X60000123\nMiguel Pereira\n80 hrs" -> "X90000123\nJürgen Schmidt\n70 hrs";
+    "X90000123\nJürgen Schmidt\n70 hrs" -> "X05000123\nEmily Brown\n40 hrs";
+    "X60000123\nMiguel Pereira\n80 hrs" -> "X20000123\nJane Smith\n100 hrs";
+    "X20000123\nJane Smith\n100 hrs" -> "X04000123\nLuca Rossi\n120 hrs";
+    "X30000123\nMarta Rodríguez\n150 hrs" -> "X50000123\nAisha Ahmed\n175 hrs";
+    "X50000123\nAisha Ahmed\n175 hrs" -> "X03000123\nPriya Sharma\n190 hrs";
+    "X70000123\nIsabella Santos\n215 hrs" -> "X02000123\nHans Müller\n305 hrs";
+    "X02000123\nHans Müller\n305 hrs" -> "X80000123\nOlga Ivanova\n295 hrs";
+    "X80000123\nOlga Ivanova\n295 hrs" -> "X01000123\nChen Wei\n235 hrs";
+    "X80000123\nOlga Ivanova\n295 hrs" -> "X10000123\nJohn Doe\n300 hrs";
+    "X02000123\nHans Müller\n305 hrs" -> "X40000123\nCarlos García\n640 hrs";
+    "X40000123\nCarlos García\n640 hrs" -> "X06000123\nFatima Al-Sayed\n365 hrs";
+    "X40000123\nCarlos García\n640 hrs" -> "X07000123\nThabo Ndlovu\n999 hrs";
+}

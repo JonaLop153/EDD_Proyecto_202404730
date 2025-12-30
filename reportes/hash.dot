@@ -1,0 +1,33 @@
+digraph TablaHash {
+    rankdir=LR;
+    node [shape=record];
+    tabla [label="<f0> 0|<f1> 1|<f2> 2|<f3> 3|<f4> 4|<f5> 5|<f6> 6|<f7> 7|<f8> 8|<f9> 9|<f10> 10|<f11> 11|<f12> 12|<f13> 13|<f14> 14|<f15> 15|<f16> 16|<f17> 17|<f18> 18"];
+    nodo_0_0 [label="{X04000123|Luca Rossi|120 hrs}"];
+    tabla:f0 -> nodo_0_0;
+    nodo_1_0 [label="{X20000123|Jane Smith|100 hrs}"];
+    tabla:f1 -> nodo_1_0;
+    nodo_1_1 [label="{X05000123|Emily Brown|40 hrs}"];
+    nodo_1_0 -> nodo_1_1;
+    nodo_2_0 [label="{X06000123|Fatima Al-Sayed|365 hrs}"];
+    tabla:f2 -> nodo_2_0;
+    nodo_4_0 [label="{X70000123|Isabella Santos|215 hrs}"];
+    tabla:f4 -> nodo_4_0;
+    nodo_6_0 [label="{X40000123|Carlos García|640 hrs}"];
+    tabla:f6 -> nodo_6_0;
+    nodo_9_0 [label="{X90000123|Jürgen Schmidt|70 hrs}"];
+    tabla:f9 -> nodo_9_0;
+    nodo_11_0 [label="{X60000123|Miguel Pereira|80 hrs}"];
+    tabla:f11 -> nodo_11_0;
+    nodo_13_0 [label="{X30000123|Marta Rodríguez|150 hrs}"];
+    tabla:f13 -> nodo_13_0;
+    nodo_16_0 [label="{X80000123|Olga Ivanova|295 hrs}"];
+    tabla:f16 -> nodo_16_0;
+    nodo_16_1 [label="{X01000123|Chen Wei|235 hrs}"];
+    nodo_16_0 -> nodo_16_1;
+    nodo_17_0 [label="{X02000123|Hans Müller|305 hrs}"];
+    tabla:f17 -> nodo_17_0;
+    nodo_18_0 [label="{X50000123|Aisha Ahmed|175 hrs}"];
+    tabla:f18 -> nodo_18_0;
+    nodo_18_1 [label="{X03000123|Priya Sharma|190 hrs}"];
+    nodo_18_0 -> nodo_18_1;
+}
